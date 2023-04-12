@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <title>Expense Tracker</title>
+</head>
+<body>
+    <h1>EXPENSE TRACKER</h1>
+    <hr>
+    <div class="container">
+        <form id="addform">
+            <label for="ExpenseAmount" class="form-label">Expense Amount</label>
+            <input type="text" id="ExpenseAmount" class="form-control" >
+            <label for="Description" class="form-label">Choose description</label>
+            <input type="text" id="Description" class="form-control" >
+            <div>
+                <label for="Category" class="form-label">Choose Category</label>
+            <select id="Category" class="form-select">
+                <option value="ElectircityBill">ElectircityBill</option>
+                <option value="WaterBill">WaterBill</option>
+                <option value="Restraunt">Restraunt</option>
+                <option value="HouseRent">HouseRent</option>
+                <option value="Food">Food</option>
+            </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Add Expense</button>
+            
+        </form><hr>
+        <ul id="list-group"></ul>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    <script src="E:\expense tracker\expensetracker3.js">
+
+    </script>
+</body>
+</html>
