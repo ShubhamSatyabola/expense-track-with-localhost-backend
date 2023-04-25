@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <title>signup/login page</title>
+</head>
+<body>
+    
+    <div class="container">
+        <h1 >sign-up</h1>
+        <hr>
+        <form id="addform" onsubmit="signup(event)">
+            <label for="name" class="form-label">Username</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+            <label for="email" class="form-label">Email</label>
+            <input type="text" id="email" name="email" class="form-control" required>
+            <label for="password" class="form-label">Password</label>
+            <input type="text" id="password" name="password" class="form-control" required>
+            <br>
+        
+            <div>
+            <button type="submit" class="btn btn-primary">signup</button>
+            <a href="/login" class="btn btn-primary" >login</a>
+            </div>
+            
+        </form><hr>
+
+        <ul id="list-group"></ul>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    <script>
+    async function signup(e){
+        try{e.preventDefault();
+        const name = e.target.name.value
+        const email = e.target.email.value
+        const password = e.target.password.value
+        const signUpDetails = {name,email,password};
+        const response = await axios.post('http://localhost:3000/sign-up',signUpDetails)
+        if (response.status===201){
+            window.location.href="../login/login.html"
+        }
+        else{
+            throw new Error('failed to login')
+        }
+        }catch(err){
+            document.body.innerHTML += `${err}`
+            console.log(err)
+        }
+
+    }
+    
+    </script>
+</body>
+</html>
