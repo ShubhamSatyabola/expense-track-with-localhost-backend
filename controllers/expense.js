@@ -28,7 +28,6 @@ exports.deleteExpense = async(req, res, next) => {
     try {const id = req.params.expenseId
         const expense = await Expense.findByPk(id);
         expense.destroy();
-        console.log('Destroyed Project')
         }
         catch(err){console.log(err)};
 }
