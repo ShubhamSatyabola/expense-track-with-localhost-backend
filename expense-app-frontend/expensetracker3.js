@@ -4,7 +4,9 @@ form.addEventListener('submit', setlocalStorage)
 
 window.addEventListener('DOMContentLoaded', async () => {
     try {
-        const res = await axios.get('http://localhost:3000/expense/get-expense');
+        const token = localStorage.getItem('token')
+        console.log(token)
+        const res = await axios.get('http://localhost:3000/expense/get-expense', {headers: {'Authorization': token}});
         for(i in res.data.allExpense){
             showOnScreen(res.data.allExpense[i])
         }
@@ -20,7 +22,8 @@ async function setlocalStorage(e){
     var category = document.getElementById('Category').value;
     
     const data = {amount , description , category};
-    const response = await axios.post('http://localhost:3000/expense/post-expense', data)
+    const token = localStorage.getItem('token')
+    const response = await axios.post('http://localhost:3000/expense/post-expense',data, {headers: {'Authorization': token}})
     showOnScreen(response.data.expenseDetail);
     }catch (err){
         console.log(err)
@@ -41,9 +44,10 @@ async function showOnScreen(data){
         btn.appendChild(document.createTextNode('Delete'))
         
         btn.onclick = async () => {
+            const token = localStorage.getItem('token')
             ul.removeChild(li)
-            await axios.delete(`http://localhost:3000/expense/delete-expense/${data.id}`)
-            
+            const remove = await axios.delete(`http://localhost:3000/expense/delete-expense/${data.id}`,{headers: {'Authorization': token}})
+            alert(remove.data.message)
         }
         li.appendChild(btn)
         ul.appendChild(li)

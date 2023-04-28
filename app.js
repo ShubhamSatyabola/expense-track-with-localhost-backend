@@ -7,6 +7,7 @@ const errorController = require('./controllers/error');
 const sequelize = require('./util/database');
 
 const User = require("./models/user")
+const Expense = require("./models/expense")
 
 const app = express();
 app.use(cors());
@@ -24,7 +25,8 @@ app.use('/user',userRoutes)
 app.use('/expense',expenseRoutes);
 
 
-
+User.hasMany(Expense);
+Expense.belongsTo(User);
 
 sequelize.sync()
 .then(result=>{
