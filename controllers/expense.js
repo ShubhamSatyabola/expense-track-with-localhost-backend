@@ -2,9 +2,11 @@ const Expense = require('../models/expense');
 
 exports.getExpense = async (req, res, next) => {
    try{
+    const check = req.user.ispremiumuser
     const data = await req.user.getExpenses()
-    console.log(data)
-    res.status(200).json({allExpense: data})
+    //console.log(data)
+    
+    res.status(200).json({allExpense: data , check})
 }catch(err){
     console.log(err)
 }

@@ -1,12 +1,15 @@
 var form = document.getElementById('addform')
 var ul = document.getElementById('list-group')
-form.addEventListener('submit', setlocalStorage)
 
+form.addEventListener('submit', setlocalStorage)
 window.addEventListener('DOMContentLoaded', async () => {
     try {
         const token = localStorage.getItem('token')
-        console.log(token)
+        //console.log(token)
         const res = await axios.get('http://localhost:3000/expense/get-expense', {headers: {'Authorization': token}});
+        if(res.data.check == true){
+            document.getElementById('rzp-button1').remove()
+        }
         for(i in res.data.allExpense){
             showOnScreen(res.data.allExpense[i])
         }
@@ -55,6 +58,44 @@ async function showOnScreen(data){
         console.log(err);
     }
     
+    }
+
+document.getElementById('rzp-button1').onclick = async function(e){
+    try{
+       const token = localStorage.getItem('token');
+       const response = await axios.get('http://localhost:3000/purchase/premium-membership',{headers:{'Authorization':token}})
+       //console.log(response)
+       var options = {
+        "key": response.data.key_id,
+        "order_id":response.data.order.id,
+        "handler":async function(response){
+            await axios.post('http://localhost:3000/purchase/update-transaction-status',{
+                order_id: options.order_id,
+                payment_id: response.razorpay_payment_id
+            },{headers:{'Authorization':token}})
+            document.getElementById('rzp-button1').remove()
+            alert('you are a premium user now')
+            
+            }
+       }
+       const rzp1 = new Razorpay(options);
+       rzp1.open();
+       e.preventDefault()
+       rzp1.on('payment.failed', async function(response){
+        await axios.post('http://localhost:3000/purchase/update-transaction-status',{
+                status: "failed",
+                order_id: options.order_id,
+                payment_id: response.razorpay_payment_id
+            },{headers:{'Authorization':token}})
+        //console.log(response)
+        
+       })
+    }
+    
+
+    catch(err){
+        console.log(err)
+    }
     }
     
 
