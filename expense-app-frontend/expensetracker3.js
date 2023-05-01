@@ -7,9 +7,13 @@ window.addEventListener('DOMContentLoaded', async () => {
         const token = localStorage.getItem('token')
         //console.log(token)
         const res = await axios.get('http://localhost:3000/expense/get-expense', {headers: {'Authorization': token}});
-        if(res.data.check == true){
-            document.getElementById('rzp-button1').remove()
-        }
+         if(res.data.check == true){
+            premiumFeatures()
+            
+        //     document.getElementById('rzp-button1').remove()
+        //     document.getElementById('text').innerHTML='you are a premium user now'
+         }
+        
         for(i in res.data.allExpense){
             showOnScreen(res.data.allExpense[i])
         }
@@ -73,8 +77,8 @@ document.getElementById('rzp-button1').onclick = async function(e){
                 order_id: options.order_id,
                 payment_id: response.razorpay_payment_id
             },{headers:{'Authorization':token}})
-            document.getElementById('rzp-button1').remove()
-            alert('you are a premium user now')
+            premiumFeatures()
+            
             
             }
        }
@@ -97,5 +101,31 @@ document.getElementById('rzp-button1').onclick = async function(e){
         console.log(err)
     }
     }
+async function premiumFeatures(){
+     try{
+        document.getElementById('text').innerHTML='you are a premium user now'
+        const leaderboard = document.getElementById('rzp-button1')
+        leaderboard.innerHTML = "leaderboard"
+        leaderboard.onclick = async () => {
+            const token = localStorage.getItem('token')
+            const response = await axios.get('http://localhost:3000/premium/leaderboard',{headers:{'Authorization':token}})
+            for (let i of response.data.sort ){
+                const li = document.createElement('li')
+                li.textContent=`${i.name} ==> ${i.totalexpense}`
+                document.getElementById('text').appendChild(li)
+            }
+        }
+        
+        
+     }
+     catch(err){
+        console.log(err)
+     }
+        
+
+        
+    
+    
+}
     
 
