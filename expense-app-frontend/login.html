@@ -11,7 +11,7 @@
     
     <div class="container">
         <div >
-            <h1 >log-in</h1>
+            <h1 class="text-center">log-in</h1>
             <p class="float-right" >New User....<a href="./signup.html" class="float-sm-right"  >signup</a></p>  
         </div>
         <br>
@@ -27,12 +27,17 @@
             <button type="submit" class="btn btn-primary">login</button>
             
             
-        </form><hr>
+        </form><br>
+         <button class="btn btn-primary" id="forgotpassword">Forgot password</button>
 
         <ul id="list-group"></ul>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
     <script>
+    const forgotpassword = document.getElementById('forgotpassword');
+    forgotpassword.onclick = () =>{
+        window.location.href="./forgotpass.html"
+    }
     async function login(e){
         try{e.preventDefault();
         const email = e.target.email.value
@@ -41,21 +46,14 @@
         const response = await axios.post('http://localhost:3000/user/log-in',logInDetails)
         //console.log(response)
         if (response.status===201){
-            //window.location.href="../login/login.html"
-            return alert(`${response.data.message}`)
-    
+            alert(`${response.data.message}`)
+            localStorage.setItem('token', response.data.token)
+            window.location.href="./index3.html"
         }
-        else{
-            return alert(`${response.data.error}`)
-        }
-        
-
-        
-        
         }catch(err){
-            //console.log(err)
-            document.body.innerHTML += `${err}`
-
+            //console.log(err.response.data)
+            //document.body.innerHTML += `${err.response.data.error}`
+            alert(`${err.response.data.error}`)
             
         }
 
