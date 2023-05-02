@@ -31,7 +31,8 @@ async function setlocalStorage(e){
     const data = {amount , description , category};
     const token = localStorage.getItem('token')
     const response = await axios.post('http://localhost:3000/expense/post-expense',data, {headers: {'Authorization': token}})
-    showOnScreen(response.data.expenseDetail);
+    //console.log(response)
+    showOnScreen(response.data.expenseDetail[0]);
     }catch (err){
         console.log(err)
     }
