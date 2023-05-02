@@ -105,13 +105,15 @@ async function premiumFeatures(){
      try{
         document.getElementById('text').innerHTML='you are a premium user now'
         const leaderboard = document.getElementById('rzp-button1')
-        leaderboard.innerHTML = "leaderboard"
+        leaderboard.innerHTML = "show leaderboard"
         leaderboard.onclick = async () => {
             const token = localStorage.getItem('token')
             const response = await axios.get('http://localhost:3000/premium/leaderboard',{headers:{'Authorization':token}})
-            for (let i of response.data.sort ){
+           //console.log(response)
+            for (let i of response.data.leaderboarduser ){
                 const li = document.createElement('li')
-                li.textContent=`${i.name} ==> ${i.totalexpense}`
+                li.className = 'list-group-item'
+                li.textContent=`Name ${i.name} ==> total expense  ${i.totalexpense}`
                 document.getElementById('text').appendChild(li)
             }
         }
