@@ -55,6 +55,7 @@ async function showOnScreen(data){
             const token = localStorage.getItem('token')
             ul.removeChild(li)
             const remove = await axios.delete(`http://localhost:3000/expense/delete-expense/${data.id}`,{headers: {'Authorization': token}})
+            //console.log(remove)
             alert(remove.data.message)
         }
         li.appendChild(btn)

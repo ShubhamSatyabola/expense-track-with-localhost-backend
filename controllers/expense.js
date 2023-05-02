@@ -1,4 +1,5 @@
 const Expense = require('../models/expense');
+const sequelize = require('../util/database')
 
 exports.getExpense = async (req, res, next) => {
    try{
@@ -12,39 +13,61 @@ exports.getExpense = async (req, res, next) => {
 }
 }
 exports.postExpense = async (req, res, next) => {
-    try{const amount = req.body.amount;
+    try{
+    const t = await sequelize.transaction()
+    const amount = req.body.amount;
     const description = req.body.description;
     const category = req.body.category;
     //const expense = await Expense.create({amount: amount,description: description, category: category,userId:req.user.id})
+    if (amount===undefined || amount.length===0 || description===undefined || description.length===0){
+        return res.status(400).json({error:'all fields required'})
+    }
+    
     const totalExpense = +req.user.totalexpense + +amount
     const expense =  req.user.createExpense({
         amount: amount,
         description: description,
         category: category
-    })
-    const promise1 = req.user.update({totalexpense:totalExpense})
+    },{transaction: t})
+    const promise1 = req.user.update({totalexpense:totalExpense},{transaction:t})
     Promise.all([expense,promise1])
-    .then((response)=>{res.status(200).json({expenseDetail: response})}
-        )
-    .catch(err=>console.log(err))
+    .then(async (response)=>{
+        await t.commit()
+        res.status(200).json({expenseDetail: response})
+    })
+    .catch(async(err)=>{
+        await t.rollback()
+        console.log(err)
+    })
     
 
-}catch(err){
+}
+catch(err){
+    await t.rollback()
     console.log(err)
 }
-
+   
 }
 exports.deleteExpense = async(req, res, next) => {
     try {const id = req.params.expenseId
+
+        const t = await sequelize.transaction()
         
         const expense = await Expense.findByPk(id);
         const totalExpense = +req.user.totalexpense - +expense.amount
-        const promise1 = req.user.update({totalexpense: totalExpense})
-        const promise2 = expense.destroy({where:{userId:req.user.id}});
+        const promise1 = req.user.update({totalexpense: totalExpense},{transaction:t})
+        const promise2 = expense.destroy({where:{userId:req.user.id},transaction:t});
         Promise.all([promise1,promise2])
-        .then(res.status(200).json({message: "deleted successfully"}))
-        .catch(err=>console.log(err))
+        .then(async(response)=>{
+            await t.commit()
+            res.status(200).json({message: "deleted successfully"})
+        })
+        .catch(async(err)=>{
+            await t.rollback()
+            console.log(err)})
         }
-        catch(err){console.log(err)
+        catch(err){
+        await t.rollback()
+        console.log(err)
         res.status(500).json("something went wrong")};
 }
