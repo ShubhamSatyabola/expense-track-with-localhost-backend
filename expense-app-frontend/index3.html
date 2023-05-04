@@ -25,12 +25,52 @@
                 <option value="HouseRent">HouseRent</option>
                 <option value="Food">Food</option>
             </select>
-            </div>
+            
+        </div>
             
             <button type="submit" class="btn btn-primary">Add Expense</button>
             
-        </form><hr>
-        <ul id="list-group"></ul>
+        </form><br>
+        
+        <div>
+            <button id="rzp-button1" class="btn btn-primary">Buy Premium</button>
+            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        </div>
+        
+        <div id="text" class="list-group"></div><hr>
+        <h1 class="text-center bg-danger">Daily Expense</h1>
+        <table class="table table-bordered table-dark">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Description</th>
+                <th scope="col">Categoty</th>
+                <th scope="col">Income</th>
+                <th scope="col">Expenses</th>
+              </tr>
+        </thead></table>
+        <h1 class="text-center bg-danger">Weekly Expense</h1>
+        <table class="table table-bordered table-dark">
+                <thead>
+                  <tr>
+                    <th scope="col">weeks</th>
+                    <th scope="col">Income</th>
+                    <th scope="col">Expenses</th>
+                    <th scope="col">Savings</th>
+                  </tr>
+        </thead></table>
+        <h1 class="text-center bg-danger">Monthly Expense</h1>
+        <table class="table table-bordered table-dark">
+        <thead>
+              <tr>
+                <th scope="col">Month</th>
+                <th scope="col">Income</th>
+                <th scope="col">Expenses</th>
+                <th scope="col">Savings</th>
+              </tr>
+        </thead></table>
+        <button class="btn btn-primary float-lg-right">Download Report</button>
+        <div id="list-group" class="text-dark"></div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
     <script src="E:\expense tracker\expense-app-frontend\expensetracker3.js">
