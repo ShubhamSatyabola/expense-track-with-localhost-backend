@@ -9,9 +9,10 @@ const dotenv = require('dotenv');
 const errorController = require('./controllers/error');
 const sequelize = require('./util/database');
 
-const User = require("./models/user")
-const Expense = require("./models/expense")
+const User = require("./models/user");
+const Expense = require("./models/expense");
 const Order = require("./models/orders");
+const Forgotpass = require('./models/forgotpass');
 
 const app = express();
 dotenv.config();
@@ -41,6 +42,9 @@ Expense.belongsTo(User);
 
 User.hasMany(Order);
 Order.belongsTo(User);
+
+User.hasMany(Forgotpass);
+Forgotpass.belongsTo(User)
 
 sequelize.sync()
 .then(result=>{
