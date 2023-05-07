@@ -1,10 +1,13 @@
+const Userservice = require('../service/userservice')
+const S3service = require('../service/s3')
+
 const Expense = require('../models/expense');
-const sequelize = require('../util/database')
+const sequelize = require('../util/database');
 
 exports.getExpense = async (req, res, next) => {
    try{
     const check = req.user.ispremiumuser
-    const data = await req.user.getExpenses()
+    const data = await Userservice.getExpenses(req)
     //console.log(data)
     
     res.status(200).json({allExpense: data , check})
@@ -70,4 +73,23 @@ exports.deleteExpense = async(req, res, next) => {
         await t.rollback()
         console.log(err)
         res.status(500).json("something went wrong")};
+}
+
+exports.downloadReport = async (req,res,next)=>{
+    try{
+        const expenses = await req.user.getExpenses();
+        //console.log(expenses)
+        const stringifiedExpenses = JSON.stringify(expenses);
+        const userId = req.user.id
+        const filename = `Expense${userId}/${new Date()}.txt`
+        
+        const fileURl = await S3service.uploadToS3(stringifiedExpenses, filename)
+        //console.log(fileURl)
+        await req.user.createDownloadreport({URL:fileURl})
+        res.status(200).json({fileURl, success: true})
+    }
+    catch(err){
+        console.log(err)
+        res.status(400).json({error:err})
+    }
 }

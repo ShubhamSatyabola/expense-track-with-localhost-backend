@@ -97,12 +97,11 @@ document.getElementById('rzp-button1').onclick = async function(e){
         
        })
     }
-    
-
     catch(err){
         console.log(err)
     }
     }
+
 async function premiumFeatures(){
      try{
         document.getElementById('text').innerHTML='you are a premium user now'
@@ -119,17 +118,29 @@ async function premiumFeatures(){
                 document.getElementById('text').appendChild(li)
             }
         }
-        
-        
      }
      catch(err){
         console.log(err)
      }
-        
-
-        
-    
-    
 }
-    
+
+async function downloadReport(){
+    try{
+        const token = localStorage.getItem('token')
+        const report = await axios.get('http://localhost:3000/expense/download-report',{headers:{'Authorization':token}})
+        //console.log(report)
+        if(report.status === 200){
+            var a = document.createElement('a')
+            a.href = report.data.fileURl
+            a.download ='myexpense.csv'
+            a.click()
+        }
+        else{
+            throw new Error (report.data.error)
+        }
+    }
+    catch(err){
+        console.lg(err)
+    }
+}
 

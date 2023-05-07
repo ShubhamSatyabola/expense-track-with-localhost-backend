@@ -13,6 +13,7 @@ const User = require("./models/user");
 const Expense = require("./models/expense");
 const Order = require("./models/orders");
 const Forgotpass = require('./models/forgotpass');
+const Downloadreport = require('./models/downloadreport')
 
 const app = express();
 dotenv.config();
@@ -45,6 +46,9 @@ Order.belongsTo(User);
 
 User.hasMany(Forgotpass);
 Forgotpass.belongsTo(User)
+
+User.hasMany(Downloadreport);
+Downloadreport.belongsTo(User);
 
 sequelize.sync()
 .then(result=>{
