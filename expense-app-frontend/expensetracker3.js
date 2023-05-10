@@ -5,22 +5,39 @@ form.addEventListener('submit', setlocalStorage)
 window.addEventListener('DOMContentLoaded', async () => {
     try {
         const token = localStorage.getItem('token')
+        const page = 1
         //console.log(token)
-        const res = await axios.get('http://localhost:3000/expense/get-expense', {headers: {'Authorization': token}});
-         if(res.data.check == true){
+        const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}`, {headers: {'Authorization': token}});
+        console.log(res)
+        if(res.data.check == true){
             premiumFeatures()
             
         //     document.getElementById('rzp-button1').remove()
         //     document.getElementById('text').innerHTML='you are a premium user now'
          }
+        listExpense(res.data.allExpense)
+        showPagination(res.data)
         
-        for(i in res.data.allExpense){
-            showOnScreen(res.data.allExpense[i])
-        }
+        // for(i in res.data.allExpense){
+        //     showOnScreen(res.data.allExpense[i])
+        // }
+
     }catch(err){
         console.log(err)
     }
 })
+async function listExpense(data){
+    try{
+        for (i in data){
+            showOnScreen(data[i])
+        }
+    }
+    catch(err){
+        console.log(err)
+    }
+    
+
+}
 async function setlocalStorage(e){
     try{e.preventDefault();
     
@@ -31,8 +48,12 @@ async function setlocalStorage(e){
     const data = {amount , description , category};
     const token = localStorage.getItem('token')
     const response = await axios.post('http://localhost:3000/expense/post-expense',data, {headers: {'Authorization': token}})
+    window.location.reload()
     //console.log(response)
-    showOnScreen(response.data.expenseDetail[0]);
+    // const res = await axios.get(`http://localhost:3000/expense/get-expense?page=1`, {headers: {'Authorization': token}});
+    //listExpense(response.data.expenseDetail[0])
+    // showPagination(response.data)
+    //showOnScreen(response.data.expenseDetail[0]);
     }catch (err){
         console.log(err)
     }
@@ -141,6 +162,46 @@ async function downloadReport(){
     }
     catch(err){
         console.lg(err)
+    }
+}
+async function showPagination({currentPage,hasNextPage,nextPage,hasPreviousPage,previousPage,lastPage}){
+    try{
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = ''
+        if(hasPreviousPage){
+            const btn2 = document.createElement('button')
+            btn2.innerHTML = previousPage
+            btn2.addEventListener('click', ()=>getProducts(previousPage))
+            pagination.appendChild(btn2)
+        }
+        const btn1 = document.createElement('button')
+        btn1.innerHTML = currentPage
+        btn1.addEventListener('click',()=>getProducts(currentPage))
+        pagination.appendChild(btn1)
+
+        if (hasNextPage){
+            const btn3 = document.createElement('button')
+            btn3.innerHTML = nextPage
+            btn3.addEventListener('click',()=>getProducts(nextPage))
+            pagination.appendChild(btn3)
+
+        }
+
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+async function getProducts(page){
+    try{
+        const token = localStorage.getItem('token')
+        const response = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}`,{headers: {'Authorization': token}})
+        console.log(response)
+        listExpense(response.data.allExpense)
+        showPagination(response.data)
+    }
+    catch(err){
+        console.log(err)
     }
 }
 
