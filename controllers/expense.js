@@ -3,17 +3,16 @@ const S3service = require('../service/s3')
 
 const Expense = require('../models/expense');
 const sequelize = require('../util/database');
-const EXPENSE_PER_PAGE = 10
 exports.getExpense = async (req, res, next) => {
    try{
     const check = req.user.ispremiumuser
     const page = +req.query.page || 1
-    let totalExpense=await req.user.countExpenses
-    ();
+    const pageSize =  +req.query.pageSize || 10
+    let totalExpense=await req.user.countExpenses();
     console.log(totalExpense)
     
     const data = await Userservice.getExpenses(req,
-        {offset:(page-1)*EXPENSE_PER_PAGE,limit:EXPENSE_PER_PAGE,
+        {offset:(page-1)*pageSize,limit:pageSize,
         order:[['id','DESC']]
     })
     console.log(data)
@@ -22,11 +21,11 @@ exports.getExpense = async (req, res, next) => {
         allExpense: data ,
         check,
         currentPage:page,
-        hasNextPage:EXPENSE_PER_PAGE*page < totalExpense,
+        hasNextPage:pageSize*page < totalExpense,
         nextPage: page+1,
         hasPreviousPage:page>1,
         previousPage:page-1,
-        lastPage:Math.ceil(totalExpense/EXPENSE_PER_PAGE)
+        lastPage:Math.ceil(totalExpense/pageSize)
         
         })
 }catch(err){

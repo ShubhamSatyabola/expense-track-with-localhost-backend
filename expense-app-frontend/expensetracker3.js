@@ -4,10 +4,13 @@ var ul = document.getElementById('list-group')
 form.addEventListener('submit', setlocalStorage)
 window.addEventListener('DOMContentLoaded', async () => {
     try {
+        const pageSize = localStorage.getItem('pageSize') 
         const token = localStorage.getItem('token')
         const page = 1
+        //const pageSize = document.getElementById('pageSize').value
+        //console.log(pageSize)
         //console.log(token)
-        const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}`, {headers: {'Authorization': token}});
+        const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`, {headers: {'Authorization': token}});
         console.log(res)
         if(res.data.check == true){
             premiumFeatures()
@@ -26,6 +29,22 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.log(err)
     }
 })
+
+async function pageSize(val){
+    try{
+        //const token = localStorage.getItem('token')
+        localStorage.setItem('pageSize',`${val}`)
+        //const page = 1
+        window.location.reload()
+        //const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${val}`, {headers: {'Authorization': token}});
+        //listExpense(res.data.allExpense)
+        //showPagination(res.data)
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+
 async function listExpense(data){
     try{
         for (i in data){
@@ -39,7 +58,8 @@ async function listExpense(data){
 
 }
 async function setlocalStorage(e){
-    try{e.preventDefault();
+    try{
+    e.preventDefault();
     
     var amount = document.getElementById('ExpenseAmount').value;
     var description = document.getElementById('Description').value;
@@ -186,6 +206,13 @@ async function showPagination({currentPage,hasNextPage,nextPage,hasPreviousPage,
             pagination.appendChild(btn3)
 
         }
+        if (currentPage!==1){
+            const btn4 = document.createElement('button')
+            btn4.innerHTML = 'main-page'
+            btn4.addEventListener('click',()=>getProducts(1))
+            pagination.appendChild(btn4)
+
+        }
 
     }
     catch(err){
@@ -195,7 +222,8 @@ async function showPagination({currentPage,hasNextPage,nextPage,hasPreviousPage,
 async function getProducts(page){
     try{
         const token = localStorage.getItem('token')
-        const response = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}`,{headers: {'Authorization': token}})
+        const pageSize = localStorage.getItem('pageSize')
+        const response = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`,{headers: {'Authorization': token}})
         console.log(response)
         listExpense(response.data.allExpense)
         showPagination(response.data)
