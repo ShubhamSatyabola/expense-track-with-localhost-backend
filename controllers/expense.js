@@ -9,13 +9,13 @@ exports.getExpense = async (req, res, next) => {
     const page = +req.query.page || 1
     const pageSize =  +req.query.pageSize || 10
     let totalExpense=await req.user.countExpenses();
-    console.log(totalExpense)
+    //console.log(totalExpense)
     
     const data = await Userservice.getExpenses(req,
         {offset:(page-1)*pageSize,limit:pageSize,
         order:[['id','DESC']]
     })
-    console.log(data)
+    //console.log(data)
     
     res.status(200).json({
         allExpense: data ,
@@ -39,28 +39,28 @@ exports.postExpense = async (req, res, next) => {
     const description = req.body.description;
     const category = req.body.category;
     //const expense = await Expense.create({amount: amount,description: description, category: category,userId:req.user.id})
-    if (amount===undefined || amount.length===0 || description===undefined || description.length===0){
+    if(amount===undefined || amount.length===0 || description===undefined || description.length===0){
         return res.status(400).json({error:'all fields required'})
     }
     
-    const totalExpense = +req.user.totalexpense + +amount
-    const expense =  req.user.createExpense({
-        amount: amount,
-        description: description,
-        category: category
-    },{transaction: t})
-    const promise1 = req.user.update({totalexpense:totalExpense},{transaction:t})
-    Promise.all([expense,promise1])
-    .then(async (response)=>{
-        await t.commit()
-        res.status(200).json({expenseDetail: response})
-    })
-    .catch(async(err)=>{
-        await t.rollback()
-        console.log(err)
-    })
+        
+        const totalExpense = +req.user.totalexpense + +amount
+        const expense =  req.user.createExpense({
+            amount: amount,
+            description: description,
+            category: category
+        },{transaction: t})
+        const promise1 = req.user.update({totalexpense:totalExpense},{transaction:t})
+        Promise.all([expense,promise1])
+        .then(async (response)=>{
+            await t.commit()
+            res.status(200).json({expenseDetail: response})
+        })
+        .catch(async(err)=>{
+            await t.rollback()
+            console.log(err)
+        })   
     
-
 }
 catch(err){
     await t.rollback()
@@ -94,16 +94,22 @@ exports.deleteExpense = async(req, res, next) => {
 
 exports.downloadReport = async (req,res,next)=>{
     try{
-        const expenses = await req.user.getExpenses();
-        //console.log(expenses)
-        const stringifiedExpenses = JSON.stringify(expenses);
-        const userId = req.user.id
-        const filename = `Expense${userId}/${new Date()}.txt`
-        
-        const fileURl = await S3service.uploadToS3(stringifiedExpenses, filename)
-        //console.log(fileURl)
-        await req.user.createDownloadreport({URL:fileURl})
-        res.status(200).json({fileURl, success: true})
+        if(req.user.ispremiumuser===true){
+            const expenses = await req.user.getExpenses();
+            //console.log(expenses)
+            const stringifiedExpenses = JSON.stringify(expenses);
+            const userId = req.user.id
+            const filename = `Expense${userId}/${new Date()}.txt`
+            
+            const fileURl = await S3service.uploadToS3(stringifiedExpenses, filename)
+            //console.log(fileURl)
+            await req.user.createDownloadreport({URL:fileURl})
+            res.status(200).json({fileURl, success: true})
+        }
+        else{
+            return res.status(400).json({error:'not a premium user'})
+        }
+
     }
     catch(err){
         console.log(err)

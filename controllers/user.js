@@ -2,6 +2,8 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+
+
 function generateToken(id){
  return jwt.sign({userId: id}, process.env.token)
 }
@@ -86,3 +88,4 @@ exports.postLogIn = async (req,res) => {
         res.status(500).json({error:err})
     }
 }
+

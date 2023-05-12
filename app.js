@@ -1,10 +1,14 @@
 const path = require('path');
+const fs = require('fs')
 
 const express = require('express');
+const helmet = require('helmet')
+const compression = require('compression')
+const morgan = require('morgan')
 const bodyParser = require('body-parser');
 var cors = require('cors');
 const dotenv = require('dotenv');
-
+dotenv.config();
 
 const errorController = require('./controllers/error');
 const sequelize = require('./util/database');
@@ -16,7 +20,13 @@ const Forgotpass = require('./models/forgotpass');
 const Downloadreport = require('./models/downloadreport')
 
 const app = express();
-dotenv.config();
+ 
+const accessLogStream = fs.createWriteStream(path.join(__dirname,'access.log'),
+                        {flags:'a'})
+
+app.use(helmet())
+app.use(compression())
+app.use(morgan('combined',{stream:accessLogStream}))
 app.use(cors());
 
 
@@ -52,7 +62,7 @@ Downloadreport.belongsTo(User);
 
 sequelize.sync()
 .then(result=>{
-    app.listen(3000)
+    app.listen(process.env.PORT || 3000)
     
     //  console.log(result)
 })

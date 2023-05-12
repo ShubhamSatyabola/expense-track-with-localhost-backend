@@ -1,9 +1,11 @@
 var form = document.getElementById('addform')
 var ul = document.getElementById('list-group')
+var error = document.getElementById('error')
 
 form.addEventListener('submit', setlocalStorage)
 window.addEventListener('DOMContentLoaded', async () => {
     try {
+        
         const pageSize = localStorage.getItem('pageSize') 
         const token = localStorage.getItem('token')
         const page = 1
@@ -11,15 +13,19 @@ window.addEventListener('DOMContentLoaded', async () => {
         //console.log(pageSize)
         //console.log(token)
         const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`, {headers: {'Authorization': token}});
-        console.log(res)
+        //console.log(res)
         if(res.data.check == true){
             premiumFeatures()
             
         //     document.getElementById('rzp-button1').remove()
         //     document.getElementById('text').innerHTML='you are a premium user now'
          }
-        listExpense(res.data.allExpense)
-        showPagination(res.data)
+        if(res.data.allExpense.length>0){
+            listExpense(res.data.allExpense)
+            showPagination(res.data)
+        }
+        
+        
         
         // for(i in res.data.allExpense){
         //     showOnScreen(res.data.allExpense[i])
@@ -32,13 +38,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 async function pageSize(val){
     try{
-        //const token = localStorage.getItem('token')
+        const token = localStorage.getItem('token')
         localStorage.setItem('pageSize',`${val}`)
-        //const page = 1
-        window.location.reload()
-        //const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${val}`, {headers: {'Authorization': token}});
-        //listExpense(res.data.allExpense)
-        //showPagination(res.data)
+        const page = 1
+        //window.location.reload()
+        const res = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${val}`, {headers: {'Authorization': token}});
+        //console.log(res)
+        listExpense(res.data.allExpense)
+        showPagination(res.data)
     }
     catch(err){
         console.log(err)
@@ -47,6 +54,7 @@ async function pageSize(val){
 
 async function listExpense(data){
     try{
+        ul.innerHTML=""
         for (i in data){
             showOnScreen(data[i])
         }
@@ -60,7 +68,8 @@ async function listExpense(data){
 async function setlocalStorage(e){
     try{
     e.preventDefault();
-    
+    error.innerHTML=""
+    ul.innerHTML=""
     var amount = document.getElementById('ExpenseAmount').value;
     var description = document.getElementById('Description').value;
     var category = document.getElementById('Category').value;
@@ -68,22 +77,27 @@ async function setlocalStorage(e){
     const data = {amount , description , category};
     const token = localStorage.getItem('token')
     const response = await axios.post('http://localhost:3000/expense/post-expense',data, {headers: {'Authorization': token}})
-    window.location.reload()
+    //window.location.reload()
     //console.log(response)
     // const res = await axios.get(`http://localhost:3000/expense/get-expense?page=1`, {headers: {'Authorization': token}});
-    //listExpense(response.data.expenseDetail[0])
+    // listExpense(response.data.expenseDetail)
     // showPagination(response.data)
-    //showOnScreen(response.data.expenseDetail[0]);
+    showOnScreen(response.data.expenseDetail[0]);
     }catch (err){
         console.log(err)
+        
+        //error.innerHTML+=err.response.data.error
+        alert(err.response.data.error)
+
     }
 }
 async function showOnScreen(data){
     try{
-        document.getElementById('ExpenseAmount').value = " ";
-        document.getElementById('Description').value = " ";
-        document.getElementById('Category').value = " ";
-
+        document.getElementById('ExpenseAmount').value = "";
+        document.getElementById('Description').value = "";
+        document.getElementById('Category').value = "";
+        
+        
         var li = document.createElement('li')
         li.className = 'list-group-item'
         li.textContent = `${data.category} ==> ${data.description} ==> price : ${data.amount}rs`
@@ -146,9 +160,12 @@ document.getElementById('rzp-button1').onclick = async function(e){
 async function premiumFeatures(){
      try{
         document.getElementById('text').innerHTML='you are a premium user now'
+        
         const leaderboard = document.getElementById('rzp-button1')
         leaderboard.innerHTML = "show leaderboard"
         leaderboard.onclick = async () => {
+            document.getElementById('text').innerHTML=""
+
             const token = localStorage.getItem('token')
             const response = await axios.get('http://localhost:3000/premium/leaderboard',{headers:{'Authorization':token}})
            //console.log(response)
@@ -157,6 +174,7 @@ async function premiumFeatures(){
                 li.className = 'list-group-item'
                 li.textContent=`Name ${i.name} ==> total expense  ${i.totalexpense}`
                 document.getElementById('text').appendChild(li)
+                
             }
         }
      }
@@ -176,12 +194,14 @@ async function downloadReport(){
             a.download ='myexpense.csv'
             a.click()
         }
-        else{
-            throw new Error (report.data.error)
-        }
+        // else{
+        //     alert(report.data.error)
+        // }
     }
     catch(err){
-        console.lg(err)
+        console.log(err)
+        //document.getElementById('error').innerHTML+=err.response.data.error
+        alert(err.response.data.error)
     }
 }
 async function showPagination({currentPage,hasNextPage,nextPage,hasPreviousPage,previousPage,lastPage}){
@@ -224,7 +244,7 @@ async function getProducts(page){
         const token = localStorage.getItem('token')
         const pageSize = localStorage.getItem('pageSize')
         const response = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}&pageSize=${pageSize}`,{headers: {'Authorization': token}})
-        console.log(response)
+        //console.log(response)
         listExpense(response.data.allExpense)
         showPagination(response.data)
     }
